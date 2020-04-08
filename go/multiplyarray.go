@@ -1,10 +1,12 @@
 package main
 
-func multiplyArray(arr []int) int {
-	var total = 1
+import "math/big"
+
+func multiplyArray(arr []*big.Int) *big.Int {
+	total := big.NewInt(1)
 
 	for _, val := range arr {
-		total *= val
+		total.Mul(total, val)
 	}
 
 	return total
