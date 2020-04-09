@@ -19,3 +19,7 @@ Flat took 17.277µs
 Matrix length: 50 inner arrays (each array contains 9 or 10 values, from 1 to 99)
 Routines took 187.754µs
 Flat took 50.677µs
+
+### Notes
+I had the realization that the way I was benchmarking wasn't as robust. I was multiplying the numbers into a single number,
+instead a better way to benchmark concurrency is to have two matrices and multiply the cell of each matrix into a third matrix.
