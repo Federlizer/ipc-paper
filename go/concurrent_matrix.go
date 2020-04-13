@@ -1,6 +1,6 @@
 package main
 
-func concurrentMatrix(matrix1, matrix2 [][]int) [][]int {
+func concurrentMatrix(matrix1, matrix2 [][]int, matrixLen int) [][]int {
 	var ch chan bool = make(chan bool)
 	var result [][]int = make([][]int, matrixLen)
 

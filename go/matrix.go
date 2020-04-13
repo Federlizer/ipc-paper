@@ -1,6 +1,6 @@
 package main
 
-func matrix(matrix1, matrix2 [][]int) [][]int {
+func matrix(matrix1, matrix2 [][]int, matrixLen int) [][]int {
 	var result [][]int = make([][]int, matrixLen)
 
 	for col := range matrix1 {
