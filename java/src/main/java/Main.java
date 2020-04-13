@@ -1,59 +1,45 @@
 import java.util.Random;
 
 public class Main {
-    private static int matrixLen = 32;
-    private static long fakesum = 0;
-    private static long iterations = 100000;
-
-
     public static void main(String[] args) {
-        // SEQUENTIAL
-        long sequentialDuration = 0;
+        System.out.println(Runtime.getRuntime().availableProcessors());
+        int matrixLen = 4;
 
-        for (int i = 0; i < iterations; i++) {
-            int[][] matrix1 = generateMatrix();
-            int[][] matrix2 = generateMatrix();
+        while (matrixLen < 1024) {
+            System.out.printf("%-20s %8s %11s\n\n", "name", "mean(ns)", "iterations");
+            int iterations = 2;
 
-            long start = System.nanoTime();
-            int[][] resultingMatrix = Matrix.Run(matrix1, matrix2);
-            long end = System.nanoTime();
+            //while (iterations < Integer.MAX_VALUE/2) {
+            while (iterations < 524288) {
+                int fakesum = 0;
+                int[][] matrix1 = generateMatrix(matrixLen);
+                int[][] matrix2 = generateMatrix(matrixLen);
 
-            sequentialDuration += end - start;
-            fakesum += resultingMatrix.length;
+                long start = System.nanoTime();
+                for (int i = 0; i < iterations; i++) {
+                    fakesum += ConcurrentMatrix.Run(matrix1, matrix2).length;
+                }
+                long end = System.nanoTime();
+                long elapsed = end - start;
+
+                long meanTime = elapsed / iterations;
+
+                System.out.printf(
+                        "%-20s %8d %11d\n",
+                        "matrix length " + matrixLen,
+                        meanTime,
+                        iterations
+                );
+
+                iterations *= 2;
+            }
+
+            System.out.println("\n---MATRIX DOUBLED---\n");
+            matrixLen *= 2;
         }
-
-        long sequentialMean = sequentialDuration / iterations;
-
-
-        // CONCURRENT
-        long concurrentDuration = 0;
-
-        for (int i = 0; i < iterations; i++) {
-            int[][] matrix1 = generateMatrix();
-            int[][] matrix2 = generateMatrix();
-
-            long start = System.nanoTime();
-            int[][] resultingMatrix = ConcurrentMatrix.Run(matrix1, matrix2);
-            long end = System.nanoTime();
-
-            concurrentDuration += end - start;
-            fakesum += resultingMatrix.length;
-        }
-
-        long concurrentMean = concurrentDuration / iterations;
-
-        System.out.printf("Fakesum: %d\n", fakesum);
-        System.out.printf("Matrix size: %d\n", matrixLen);
-        System.out.printf("Iterations: %d\n\n\n", iterations);
-
-        System.out.println("---SEQUENTIAL---");
-        System.out.printf("Mean time: %f microseconds\n", (float) sequentialMean / 1000);
-
-        System.out.println("---CONCURRENT---");
-        System.out.printf("Mean time: %f microseconds\n", (float) concurrentMean / 1000);
     }
 
-    public static int[][] generateMatrix() {
+    public static int[][] generateMatrix(int matrixLen) {
         Random rand = new Random();
         int[][] matrix = new int[matrixLen][matrixLen];
 

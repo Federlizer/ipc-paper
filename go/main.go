@@ -2,63 +2,47 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 )
 
-const matrixLen = 8
-
 func main() {
-	fakesum := 0
-	iterations := 100_000
 	rand.Seed(time.Now().UnixNano())
+	matrixLen := 4
 
-	// SEQUENTIAL
-	var sequentialElapsedTotal time.Duration = 0
+	for matrixLen < 1024 {
+		fmt.Printf("%-20s %8s %11s\n\n", "name", "mean(ns)", "iterations")
+		iterations := 2
 
-	for i := 0; i < iterations; i++ {
-		matrix1 := generateMatrix()
-		matrix2 := generateMatrix()
+		for iterations < math.MaxInt32/2 {
+			fakesum := 0
+			matrix1 := generateMatrix(matrixLen)
+			matrix2 := generateMatrix(matrixLen)
 
-		start := time.Now()
-		resultingMatrix := matrix(matrix1, matrix2)
-		elapsed := time.Since(start)
-		sequentialElapsedTotal += elapsed
+			start := time.Now()
 
-		fakesum += len(resultingMatrix)
+			for i := 0; i < iterations; i++ {
+				fakesum += len(concurrentMatrix(matrix1, matrix2, matrixLen))
+			}
+
+			elapsed := time.Since(start)
+			meanTime := time.Duration(int64(elapsed) / int64(iterations))
+
+			fmt.Printf("%-20s %8d %11d\n",
+				fmt.Sprintf("matrix length %d", matrixLen),
+				meanTime,
+				iterations,
+			)
+
+			iterations *= 2
+		}
+		fmt.Printf("\n---MATRIX DOUBLED---\n")
+		matrixLen *= 2
 	}
-
-	sequentialMean := time.Duration(int64(sequentialElapsedTotal) / int64(iterations))
-
-	// CONCURRENT
-	var concurrentElapsedTotal time.Duration = 0
-
-	for i := 0; i < iterations; i++ {
-		matrix1 := generateMatrix()
-		matrix2 := generateMatrix()
-
-		start := time.Now()
-		resultingMatrix := concurrentMatrix(matrix1, matrix2)
-		elapsed := time.Since(start)
-		concurrentElapsedTotal += elapsed
-
-		fakesum += len(resultingMatrix)
-	}
-
-	concurrentMean := time.Duration(int64(concurrentElapsedTotal) / int64(iterations))
-
-	fmt.Printf("Fakesum: %d\n", fakesum)
-	fmt.Printf("Matrix size: %d\n", matrixLen)
-	fmt.Printf("Iterations: %d\n\n", iterations)
-
-	fmt.Println("---SEQUENTIAL---")
-	fmt.Printf("Mean time: %f microseconds\n", float64(sequentialMean.Nanoseconds())/1000)
-
-	fmt.Println("---CONCURRENT---")
-	fmt.Printf("Mean time: %f microseconds\n", float64(concurrentMean.Nanoseconds())/1000)
 }
 
-func generateMatrix() [][]int {
+func generateMatrix(matrixLen int) [][]int {
 	var m [][]int = make([][]int, matrixLen)
 
 	for row := range m {
