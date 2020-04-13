@@ -52,12 +52,10 @@ func main() {
 	fmt.Printf("Iterations: %d\n\n", iterations)
 
 	fmt.Println("---SEQUENTIAL---")
-	fmt.Printf("Total elapsed time: %dns\n", sequentialElapsedTotal.Nanoseconds())
-	fmt.Printf("Mean time: %dns\n", sequentialMean.Nanoseconds())
+	fmt.Printf("Mean time: %f microseconds\n", float64(sequentialMean.Nanoseconds())/1000)
 
 	fmt.Println("---CONCURRENT---")
-	fmt.Printf("Total elapsed time: %dns\n", concurrentElapsedTotal.Nanoseconds())
-	fmt.Printf("Mean time: %dns\n", concurrentMean.Nanoseconds())
+	fmt.Printf("Mean time: %f microseconds\n", float64(concurrentMean.Nanoseconds())/1000)
 }
 
 func generateMatrix() [][]int {
