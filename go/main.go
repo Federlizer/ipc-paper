@@ -2,20 +2,20 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"math/rand"
+	"runtime"
 	"time"
 )
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	matrixLen := 4
+	matrixLen := 8
 
-	for matrixLen < 1024 {
+	for matrixLen <= 2048 {
 		fmt.Printf("%-20s %8s %11s\n\n", "name", "mean(ns)", "iterations")
 		iterations := 2
 
-		for iterations < math.MaxInt32/2 {
+		for iterations <= 1048576 {
 			fakesum := 0
 			matrix1 := generateMatrix(matrixLen)
 			matrix2 := generateMatrix(matrixLen)

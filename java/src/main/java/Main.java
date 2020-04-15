@@ -2,15 +2,13 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println(Runtime.getRuntime().availableProcessors());
-        int matrixLen = 4;
+        int matrixLen = 8;
 
-        while (matrixLen < 1024) {
+        while (matrixLen <= 2048) {
             System.out.printf("%-20s %8s %11s\n\n", "name", "mean(ns)", "iterations");
             int iterations = 2;
 
-            //while (iterations < Integer.MAX_VALUE/2) {
-            while (iterations < 524288) {
+            while (iterations <= 1048576) {
                 int fakesum = 0;
                 int[][] matrix1 = generateMatrix(matrixLen);
                 int[][] matrix2 = generateMatrix(matrixLen);
