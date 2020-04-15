@@ -1,12 +1,22 @@
 package main
 
+import (
+	"runtime"
+)
+
 func concurrentMatrix(matrix1, matrix2 [][]int, matrixLen int) [][]int {
+	numCPUs := runtime.NumCPU()
+	routineMatrixLength := matrixLen / numCPUs
+
 	var ch chan bool = make(chan bool)
 	var result [][]int = make([][]int, matrixLen)
 
-	for row := 0; row < matrixLen; row += 2 {
-		split := make([][]int, 2)
-		split[0], split[1] = matrix1[row], matrix1[row+1]
+	for row := 0; row < matrixLen; row += routineMatrixLength {
+		split := make([][]int, routineMatrixLength)
+
+		for i := 0; i < routineMatrixLength; i++ {
+			split[i] = matrix1[row+i]
+		}
 
 		go func(row int, ch chan<- bool) {
 			for r := range split {
@@ -19,7 +29,7 @@ func concurrentMatrix(matrix1, matrix2 [][]int, matrixLen int) [][]int {
 		}(row, ch)
 	}
 
-	for i := 0; i < matrixLen/2; i++ {
+	for i := 0; i < numCPUs; i++ {
 		<-ch
 	}
 

@@ -8,6 +8,9 @@ import (
 )
 
 func main() {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+
 	rand.Seed(time.Now().UnixNano())
 	matrixLen := 8
 
