@@ -27,15 +27,17 @@ public class ConcurrentMatrix extends Thread {
     }
 
     public static int[][] Run(int[][] matrix1, int[][] matrix2) {
-        ArrayList<ConcurrentMatrix> threads = new ArrayList<ConcurrentMatrix>();
+        int numberOfThreads = Runtime.getRuntime().availableProcessors();
+        ArrayList<ConcurrentMatrix> threads = new ArrayList<ConcurrentMatrix>(numberOfThreads);
+
         int[][] result = new int[matrix1.length][matrix1[0].length];
+        int threadMatrixLength = matrix1.length/numberOfThreads;
 
-        for (int row = 0; row < matrix1.length; row += 2) {
-            int[][] split = new int[2][matrix1[0].length];
-            split[0] = matrix1[row];
-            split[1] = matrix1[row+1];
-
+        for (int row = 0; row < matrix1.length; row += threadMatrixLength) {
+            int[][] split = new int[threadMatrixLength][matrix1[0].length];
+            System.arraycopy(matrix1, row, split, 0, threadMatrixLength);
             ConcurrentMatrix concurrentMatrix = new ConcurrentMatrix(split, matrix2, row);
+
             threads.add(concurrentMatrix);
             concurrentMatrix.start();
         }
@@ -47,9 +49,8 @@ public class ConcurrentMatrix extends Thread {
                 thread.join();
 
                 int[][] resultingMatrix = thread.getResultingMatrix();
-                result[currentRow] = resultingMatrix[0];
-                result[currentRow+1] = resultingMatrix[1];
-                currentRow += 2;
+                System.arraycopy(resultingMatrix, 0, result, currentRow, threadMatrixLength);
+                currentRow += threadMatrixLength;
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
